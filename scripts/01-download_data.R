@@ -10,7 +10,6 @@
 #### Workspace setup ####
 library(opendatatoronto)
 library(tidyverse)
-library(dplyr)
 
 #### Download data ####
 package <- show_package("ea1d6e57-87af-4e23-b722-6c1f5aa18a8d")
@@ -19,5 +18,3 @@ datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'
 data <- filter(datastore_resources, row_number()==2) %>% get_resource()
 #### Save data ####
 write_csv(data, "inputs/data/raw_data.csv") 
-
-         
