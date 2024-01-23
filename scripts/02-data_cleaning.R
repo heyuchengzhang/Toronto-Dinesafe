@@ -8,6 +8,7 @@
 
 #### Workspace setup ####
 library(tidyverse)
+library(janitor)
 
 #### Clean data ####
 
