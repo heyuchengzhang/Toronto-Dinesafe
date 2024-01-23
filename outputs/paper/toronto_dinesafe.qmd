@@ -1,0 +1,156 @@
+---
+title: "Dinesafe? A Two-Year Analysis of Food-Related Health Inspection Data Across Toronto's Diverse Food Establishments"
+author: "Heyucheng Zhang"
+thanks: "Code and data are available at: https://github.com/heyuchengzhang/Toronto-Dinesafe.git"
+date: "22 January 2024"
+date-format: "D MMMM YYYY"
+abstract: "This study analyzes data from food safety inspections conducted over a two-year period at Toronto's food establishments, and it finds a significant concentration of health infractions in the restaurant and takeout categories. Even while the number of establishments has an impact on inspection statistics, the study shows that these kinds of establishments pose a serious risk to public health. These results highlight the significance of focused health policy in the food industry of Toronto."
+format: pdf
+toc: true
+number-sections: true
+bibliography: references.bib
+---
+
+```{r}
+#| message: false
+#| echo: false
+#| warning: false
+#### Workspace set up ####
+# install.packages("tidyverse")
+# install.packages("knitr")
+# install.packages("here")
+# install.packages("janitor")
+
+library(tidyverse) # data-related packages
+library(knitr) # make tables
+library(here) # manage file paths
+library(janitor) # clean data
+
+#### Read in cleaned data ####
+
+cleaned_data <- read_csv(file = here("outputs/data/cleaned_data.csv"), show_col_types = FALSE)
+```
+
+## Introduction
+
+The variety of Toronto's food establishment types reflects the city's population, with everything from luxury restaurants to bakeries on the street available. A primary responsibility of Toronto Public Health is to guarantee that these establishments adhere to health and safety regulations. The paper focuses at information gathered from food safety inspections conducted between 2022 and 2024, or approximately two years, in order find food establishments that might require stricter regulations in the future.
+
+In addition to being a matter of public health, food establishment adherence to safety regulations is also a socially responsible move on the part of the business. Researchers and government officials now have unparalleled access to inspection data that may be applied to improve food safety and strengthen regulations to ensure food safety, according to an increase in the amount of available food safety inspection data.
+
+However, there is still a lack of knowledge regarding the precise compliance patterns found in various kinds of food establishments. By methodically examining inspection data to find patterns in infractions, this study aims to close this gap. It focuses especially on serious infractions that present serious health hazards. In order to help policymakers and public health professionals prioritize treatments and resources where they are most needed, this study hopes to accomplish this goal by offering useful guidance. The study's conclusions are critical because they identify the types of establishments that are most likely to commit serious health infractions and point out certain areas where regulations concerning food safety should be specifically strengthened. These findings have important significance for consumer confidence, public health, and wider society.
+
+The rest of the parts of this paper have been organized as follows: The packages and data sources used in this study are described in detail in Section 2 (Data). It explains the data and the statistical tools used to extract the insights from the inspection records. The results are shown in Section 3 (Results), together with several informative graphs and tables that show the real inspection data and offer a foundation for our findings. Section 4 (Discussion) dives into an extensive discussion on the larger implications of these results, taking into account the insights they provide into the present condition of food safety as well as their possible influence on efforts to promote health and regulatory frameworks. In Section 5 (Conclusion), the paper's main conclusions are summarized, together with a discussion of their significance.
+
+## Data
+
+The data for this study comes from Toronto Public Health's DineSafe program [@dinesafe], which contains a detailed record of food safety inspections conducted over a two-year period at various food establishments in the city. Evaluating the representativeness and reliability of the data was a crucial component of our measurement approach. The systematic and uniform data collection process of the DineSafe program ensures that the data is impartial and thorough. Inspections are carried out without prior notice and according to established standards. The dataset thoroughly records every inspection, indicating the kind of establishment and the seriousness of any infractions found. Our study is especially focused on more serious infractions, which we categorized as "C - Crucial" or "S - Significant." We purposefully left out of our analysis "M - Minor" infractions. These were considered secondary to our research's main goal, which is to concentrate on infractions with more significant public health effects, even if they are more common and usually less serious.
+
+We cleaned, tidied, and analyzed the dataset using the statistical programming language R [@citeR] as well as the tidyverse [@tidyverse], janitor [@tidyverse], opendatatoronto [@opendatatoronto], ggplot2 [@ggplot] and knitr [@knitr]. What's more, the here  [@here] was instrumental in managing file paths for a more reproducible workflow. We made a table (@tbl-all) detailing the number of significant and crucial infractions, sorted in descending order by the total infractions for various types of food establishments.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-all
+#| tbl-cap: Sample of Cleaned Data
+summary <- cleaned_data |>
+  group_by(establishment_type) |>
+  summarise(significant_infractions = sum(severity == "S - Significant"),
+            crucial_infractions = sum(severity == "C - Crucial")) |>
+  mutate(total_infractions = significant_infractions + crucial_infractions) |>
+  ungroup() |>
+  arrange(desc(total_infractions))
+
+head(summary, 5) |> kable()
+```
+
+## Results
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+top_10 <- head(summary, 10)
+summary_asc <- summary |> arrange(total_infractions)
+bottom_10 <- head(summary_asc, 10)
+```
+
+The results of the health inspections done over a two-year period in Toronto's food establishments are compellingly summarized in this study. When the data is visualized, it highlights clear compliance trends that correspond with our area of interest. 
+
+Remarkably, the categories of Restaurant and Food Take Out were found to be the most frequent violators, as seen by the top 10 establishments with the most infractions (@tbl-top). The data nevertheless indicates a noteworthy trend that requires attention, even though the huge number of these establishments may have contributed to the larger frequency of infractions reported.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-top
+#| tbl-cap: The Top 10 Establishment Types with the Most Infractions
+top_10 |> kable()
+```
+
+
+```{r fig-top, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="The Top 10 Establishment Types with the Most Infractions", fig.width=10, fig.height=5}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-top
+#| fig-cap: The Top 10 Establishment Types with the Most Infractions
+top_10 |> 
+  ggplot(aes(x = reorder(establishment_type, total_infractions), 
+             y = total_infractions, fill = establishment_type)) +
+  geom_col() +
+  labs(title = "The Top 10 Establishment Types with the Most Infractions",
+       x = "Establishment Type", y = "Total Infractions") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 50, hjust = 1))
+```
+
+This pattern is illustrated in @fig-top, where the Restaurant category has a noticeably larger number of infractions than the other categories. Even if the overall amount of establishments could affect these numbers, the graph still helps to clarify our study's main goals, which are to find the categories of food establishments where health infractions are most common.
+
+A different story is shared by the bottom ten establishments (@tbl-bottom), which include Bottling Plant and Rest Home. Although the smaller total number of these establishments may have an impact on the data, the low infraction rates seen here most likely reflect the strict regulations and efficient enforcement in these fields. These establishments are shown in @fig-bottom, which also highlights the categories of food services that demonstrate strong safety compliance and provide a visual contrast to the top violators.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-bottom
+#| tbl-cap: The Top 10 Establishment Types with the Fewest Infractions
+bottom_10 |> kable()
+```
+
+
+```{r fig-top, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="The Top 10 Establishment Types with the Fewest Infractions", fig.width=10, fig.height=6}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-bottom
+#| fig-cap: The Top 10 Establishment Types with the Fewest Infractions
+bottom_10 |>
+  ggplot(aes(x = reorder(establishment_type, total_infractions), 
+             y = total_infractions, fill = establishment_type)) +
+  geom_col() +
+  labs(title = "The Top 10 Establishment Types with the Fewest Infractions",
+       x = "Establishment Type", y = "Total Infractions") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+
+## Discussion
+
+@fig-top implies that there may be a correlation between the number of customer interactions and the frequency of health infractions. Particularly, Restaurant and Food Take Out are among the top infraction establishments. But given how common these establishments are, it's important to recognize that higher infraction rates could equally result from a correspondingly higher number of inspections. However, the evidence clearly shows that these categories urgently require targeted regulatory action. Comprehensive staff training, stricter oversight of food handling procedures, and a rise in the frequency of inspections to verify adherence to health regulations are examples of potential solutions. The bottom tier of establishments had considerably lower infraction counts, with specific instances being the Bottling Plant and Rest Home. Because of the special characteristics of establishments, they are likely exposed to a strict regulatory environment and constant monitoring, which is a major factor in encouraging compliance. Therefore, the data attests to the effectiveness of the current regulatory control imposed on these kinds of establishments in addition to reflecting adherence to regulations. 
+
+Although there are certain limitations, the study provides a useful overview of the many establishment types in Toronto that adhere to food safety requirements. To focus the study on more serious health issues, minor infractions were purposefully left out. Furthermore, neither the study's evaluation of the implications of any recent changes to food safety regulations nor its adjustment for variations in the number of establishments throughout the two-year period was done. 
+
+Further exploration of the data through future studies might involve examining the particulars of each establishment category's infractions and how they were resolved in afterward. Such an in-depth investigation could identify trends in the frequency of particular infraction kinds among various establishment types directing deeper and more focused corrective actions.
+
+## Conclusion
+
+This study has analyzed food safety inspection data for two years for a variety of Toronto establishments, identifying patterns and trends that provide insight into the compliance situation in the city's food industry. Particularly, it has shown that Restaurant and Food Take Out are more likely to have serious health infractions. This study highlights the potential advantages of tailoring regulatory measures to the specifics of each food service category by highlighting the need for stricter controls and education in the most affected establishment types. Strict health and safety regulations work, as seen by the significantly lower infraction rates in establishments with special characteristics.
+
+Furthermore, a more thorough analysis of the types of infractions and how they are resolved will result in a deeper understandings that will empower stakeholders to put in place stronger and efficient food safety regulations.
+
+The final goal of this and related study is to guarantee public health and welfare by directing advancements in food safety procedures. Through ongoing tracking, evaluation, and policy improvement, Toronto can aim to establish a benchmark for food safety that municipalities nationwide could emulate, thus boosting the public's confidence in the food they consume.
+
+## Reference
