@@ -10,8 +10,11 @@
 library(tidyverse)
 
 #### Clean data ####
+
+# Read data
 raw_data <- read_csv("inputs/data/raw_data.csv")
 
+# Clean data
 cleaned_data <-
   raw_data |>
   clean_names() |>

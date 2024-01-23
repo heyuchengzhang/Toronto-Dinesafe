@@ -13,8 +13,10 @@ library(tidyverse)
 library(knitr)
 
 #### Explore ####
+# Read data
 cleaned_data <- read_csv("outputs/data/cleaned_data.csv")
 
+# Summary
 summary <- cleaned_data |>
   group_by(establishment_type) |>
   summarise(significant_infractions = sum(severity == "S - Significant"),
@@ -28,10 +30,14 @@ summary_asc <- summary |> arrange(total_infractions)
 bottom_10 <- head(summary_asc, 10)
 
 #### Tables ####
+
+# Make tables
 top_10 |> kable()
 bottom_10 |> kable()
 
 #### Graphs ####
+
+# Make graphs
 top_10 |> 
   ggplot(aes(x = reorder(establishment_type, total_infractions), 
              y = total_infractions, fill = establishment_type)) +

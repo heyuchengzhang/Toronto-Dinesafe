@@ -16,11 +16,17 @@ library(opendatatoronto)
 library(tidyverse)
 
 #### Simulate data ####
+
+# Set a seed for reproducible workflows
 set.seed(123)
 
+# Define the number of days for the simulation
 number_of_days <- 730
+
+# Define the types of establishments to be included in the simulation
 establishment_types <- c("Restaurant", "Food Take Out", "Supermarket", "Food Court Vendor", "Bakery")
 
+# Simulate data
 simulated_data <- tibble(
   establishment_type = rep(establishment_types, each = number_of_days),
   severity = sample(c("C - Crucial", "S - Significant"), size = length(establishment_types) * number_of_days, replace = TRUE),
@@ -28,4 +34,5 @@ simulated_data <- tibble(
   ) |>
   arrange(inspection_date)
 
+# Display the head of the simulated data
 head(simulated_data)
