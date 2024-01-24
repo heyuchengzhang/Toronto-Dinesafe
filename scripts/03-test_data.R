@@ -11,18 +11,24 @@
 library(tidyverse)
 
 #### Test data ####
+
+# Read data
 cleaned_data <- read_csv("outputs/data/cleaned_data.csv")
 
+# Test if there are 2 unique severity levels in the "severity" column
 cleaned_data$severity |>
   unique() |>
   length() == 2
 
+# Test the unique values in the "severity" column are "C - Crucial" and "S - Significant"
 cleaned_data$severity |>
   unique() == c("C - Crucial", "S - Significant")
 
+# Test if the "establishment_type" column is a character data type.
 cleaned_data$establishment_type |>
   class() == "character"
 
+# Test if the "severity" column is a character data type.
 cleaned_data$severity |>
   class() == "character"
 

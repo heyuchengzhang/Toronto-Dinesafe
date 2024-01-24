@@ -18,10 +18,10 @@ raw_data <- read_csv("inputs/data/raw_data.csv")
 # Clean data
 cleaned_data <-
   raw_data |>
-  clean_names() |>
-  mutate(inspection_date = ymd(inspection_date)) |>
-  filter(severity %in% c("C - Crucial", "S - Significant")) |>
-  select(establishment_type, severity, inspection_date)
+  clean_names() |> # Clean names
+  mutate(inspection_date = ymd(inspection_date)) |> # Convert date format
+  filter(severity %in% c("C - Crucial", "S - Significant")) |> # Filter the rows based on whether the "severity" is "C-crucial" or "S-significant."
+  select(establishment_type, severity, inspection_date) # Select the columns "establishment_type", "severity", and "inspection_date".
 
 
 #### Save data ####
